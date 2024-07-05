@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: website-nginx-cm
+data:
+  default.conf: |-
+    server {
+        listen 8080 default_server;
+        listen 8443 ssl;
+        root /usr/share/nginx/html;
+        index index.html;
+        ssl_certificate /etc/nginx/ssl/backend.crt; 
+        ssl_certificate_key /etc/nginx/ssl/backend.key; 
+        location / {
+          proxy_pass http://localhost:3000; 
+        }
+    }
+                                                                                                                                              

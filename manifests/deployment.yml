@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: website-deployment
+spec:
+  selector:
+    matchLabels:
+      app: website
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: website
+    spec:
+      containers:
+        - name: website2
+          image: "pavansa/notes-app"
+          ports:
+            - containerPort: 3000 
+              protocol: TCP
+        - name: website
+          imagePullPolicy: Always
+          image: nginx:latest
+          ports:
+            - containerPort: 8443
+          volumeMounts:
+            - mountPath: /etc/nginx/ssl
+              name: secret-volume
+            - mountPath: /etc/nginx/conf.d
+              name: configmap-volume
+      volumes:
+        - name: secret-volume
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: 'my-certificates'
+        - name: configmap-volume
+          configMap:
+            name: website-nginx-cm
